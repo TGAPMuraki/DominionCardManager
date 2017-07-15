@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static DominionCards.DominionCardType.ACTION;
+import static DominionCards.DominionCardType.REACTION;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -41,9 +42,31 @@ class DominionCardTest {
     }
 
     @Test
-    void type_Test() {
-        DominionCardType testType = ACTION;
-        card.setType(testType);
-        assertEquals(testType, card.getType());
+    void setTypes_withArray_Test() {
+        DominionCardTypes cardTypes = new DominionCardTypes();
+        cardTypes.add(DominionCardType.ACTION);
+        cardTypes.add(DominionCardType.REACTION);
+        card.setTypes(new DominionCardType[]{DominionCardType.ACTION, DominionCardType.REACTION});
+        assertEquals(cardTypes, card.getTypes());
+    }
+
+    @Test
+    void setTypes_withTypes_Test() {
+        DominionCardTypes cardTypes = new DominionCardTypes();
+        cardTypes.add(DominionCardType.ACTION);
+        card.setTypes(cardTypes);
+        assertEquals(cardTypes, card.getTypes());
+    }
+
+    @Test
+    void types_contains_type_test() {
+        card.setTypes(new DominionCardType[]{DominionCardType.ACTION, DominionCardType.REACTION});
+        assertTrue(card.getTypes().contains(DominionCardType.ACTION));
+    }
+
+    @Test
+    void expansion_Test() {
+        card.setExpansion(DominionExpansion.DOMINION);
+        assertEquals(DominionExpansion.DOMINION, card.getExpansion());
     }
 }
