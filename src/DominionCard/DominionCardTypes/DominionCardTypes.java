@@ -1,4 +1,4 @@
-package DominionCards;
+package DominionCard.DominionCardTypes;
 
 import java.util.HashSet;
 

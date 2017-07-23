@@ -1,10 +1,11 @@
-package DominionCards;
+package DominionCard;
 
+import DominionCard.DominionCardTypes.DominionCardType;
+import DominionCard.DominionCardTypes.DominionCardTypes;
+import DominionCard.DominionExpansions.DominionExpansion;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static DominionCards.DominionCardType.ACTION;
-import static DominionCards.DominionCardType.REACTION;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
@@ -55,6 +56,15 @@ class DominionCardTest {
         DominionCardTypes cardTypes = new DominionCardTypes();
         cardTypes.add(DominionCardType.ACTION);
         card.setTypes(cardTypes);
+        assertEquals(cardTypes, card.getTypes());
+    }
+
+    @Test
+    void setTypes_withString_Test(){
+        DominionCardTypes cardTypes = new DominionCardTypes();
+        cardTypes.add(DominionCardType.ACTION);
+        cardTypes.add(DominionCardType.REACTION);
+        card.setTypes("Action - Reaction");
         assertEquals(cardTypes, card.getTypes());
     }
 
