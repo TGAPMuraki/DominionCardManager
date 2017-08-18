@@ -2,24 +2,33 @@ package DominionCardsHTMLReader;
 
 import DominionCard.DominionCard;
 import DominionCard.DominionExpansions.DominionExpansion;
-
 import DominionCards.DominionCards;
+import org.w3c.dom.Attr;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
+import javax.swing.*;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.Comparator;
 
 /**
  * Created by Muraki on 7/16/2017.
  */
 public class DominionCardsHTMLReader extends DominionCards {
 
-    public  String getInnerHTML(String htmlString) throws Exception{
-        while(htmlString.indexOf("<") == 0)
-            htmlString = htmlString.substring(htmlString.indexOf(">") + 1);
+    public String getInnerHTML(String htmlString) throws Exception {
+        while (htmlString.indexOf("<") == 0) htmlString = htmlString.substring(htmlString.indexOf(">") + 1);
 
-        while(htmlString.lastIndexOf(">") == htmlString.length() - 1)
+        while (htmlString.lastIndexOf(">") == htmlString.length() - 1)
             htmlString = htmlString.substring(0, htmlString.lastIndexOf("<"));
 
         htmlString = htmlString.replace("\n", "").replace("<br />", "\n");
@@ -27,7 +36,7 @@ public class DominionCardsHTMLReader extends DominionCards {
         return htmlString;
     }
 
-    private String readNextHTMLCardElement(BufferedReader reader) throws Exception{
+    private String readNextHTMLCardElement(BufferedReader reader) throws Exception {
         String htmlElement = "";
         while (!htmlElement.contains("</td>")) {
             htmlElement += reader.readLine();
@@ -35,7 +44,7 @@ public class DominionCardsHTMLReader extends DominionCards {
         return htmlElement;
     }
 
-    private DominionCard readHTMLCardBlock(BufferedReader reader) throws Exception{
+    private DominionCard readHTMLCardBlock(BufferedReader reader) throws Exception {
         DominionCard newCard = new DominionCard();
 
         newCard.setName(getInnerHTML(readNextHTMLCardElement(reader)));
@@ -47,7 +56,7 @@ public class DominionCardsHTMLReader extends DominionCards {
         return newCard;
     }
 
-    private void readToFirstCard(BufferedReader reader) throws Exception{
+    private void readToFirstCard(BufferedReader reader) throws Exception {
         String line;
         while ((line = reader.readLine()) != null) {
             if (line.contains("<tbody>")) {
@@ -64,7 +73,7 @@ public class DominionCardsHTMLReader extends DominionCards {
             String line;
             readToFirstCard(reader);
             while ((line = reader.readLine()) != null) {
-                if(line.contains("</tbody>")) break;
+                if (line.contains("</tbody>")) break;
                 add(readHTMLCardBlock(reader));
             }
             reader.close();
@@ -84,4 +93,42 @@ public class DominionCardsHTMLReader extends DominionCards {
         loadExpansionFromWeb(DominionExpansion.DARK_AGES.toString(), DominionExpansion.DARK_AGES);
         loadExpansionFromWeb(DominionExpansion.GUILDS.toString(), DominionExpansion.GUILDS);
     }
+
+    private void AddCardElement(Element rootElement, DominionCard dominionCard) {
+        Document document = rootElement.getOwnerDocument();
+
+        String cardElementName = "DominionCard";
+        Element cardElement = document.createElement(cardElementName);
+
+
+        Attr nameAttribute = document.createAttribute("name");
+        nameAttribute.setValue(dominionCard.getName());
+        cardElement.appendChild(nameAttribute);
+
+        rootElement.appendChild(cardElement);
+    }
+
+    public void saveToXML(String xmlFile) {
+        try {
+            Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().newDocument();
+
+            String rootName = "DominionCards";
+            Element rootElement = document.createElement(rootName);
+            document.appendChild(rootElement);
+            for(int i = 0; i < size(); i++){
+                AddCardElement(rootElement, get(i));
+            }
+
+            Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            Result output = new StreamResult(new File(xmlFile));
+            Source input = new DOMSource(document);
+
+            transformer.transform(input, output);
+
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error:", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
 }
